@@ -1,11 +1,10 @@
-import "./globals.css";
+import './globals.css';
 
-import type { Metadata } from "next";
-
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Veritas - Real-Time News & Search Agent",
-  description: "Answer user questions with accurate, real-time information",
+  title: 'Veritas - Real-Time News & Search Agent',
+  description: 'Answer user questions with accurate, real-time information',
 };
 
 export default function RootLayout({
