@@ -16,14 +16,3 @@ This project implements **Veritas**, a simple information retrieval and news ana
 - **Hallucination prevention**: If the search returns nothing reliable, the agent explicitly says it couldn’t find good information instead of guessing.
 - **Neutral tone**: Presents facts objectively and can mention multiple viewpoints on controversial topics.
 
-### High-level workflow
-
-1. Receive a user question.
-2. Decide whether it needs **news** (time-sensitive) or **general knowledge**.
-3. Call `search_tool` with a targeted query (often including the current date for news).
-4. Inspect the results (especially publication date and source reputation).
-5. Repeat search/refine if needed.
-6. Return a final, well-sourced answer to the user.
-
-The detailed behavior and examples for Veritas are defined in `sp.md`.
-
