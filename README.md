@@ -15,4 +15,3 @@ This project implements **Veritas**, a simple information retrieval and news ana
 - **Knowledge synthesis**: Combines multiple trustworthy sources into a clear, sourced answer.
 - **Hallucination prevention**: If the search returns nothing reliable, the agent explicitly says it couldn’t find good information instead of guessing.
 - **Neutral tone**: Presents facts objectively and can mention multiple viewpoints on controversial topics.
-
