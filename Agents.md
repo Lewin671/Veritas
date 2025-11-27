@@ -11,3 +11,4 @@
 - **Validation**: Zod
 - **Infrastructure**: Vercel
 - **Lint/Format**: ESLint + Prettier
+- **Package Management**: pnpm
