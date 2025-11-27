@@ -3,7 +3,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Veritas - Real-Time News & Search  Agent",
+  title: 'Veritas - Real-Time News & Search  Agent',
   description: 'Answer user questions with accurate, real-time information',
 };
 
