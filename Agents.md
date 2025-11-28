@@ -10,5 +10,5 @@
 - **State Management**: Zustand (Client-side), React Server Components (Server-side)
 - **Validation**: Zod
 - **Infrastructure**: Vercel
-- **Lint/Format**: ESLint + Prettier
+- **Lint/Format**: Biome
 - **Package Management**: pnpm
