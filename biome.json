@@ -89,7 +89,7 @@
         "useSortedClasses": {
           "level": "warn",
           "options": {
-            "attributes": ["classList"],
+            "attributes": ["class", "className", "classList"],
             "functions": ["cn", "clsx", "cva", "tw"]
           }
         }
