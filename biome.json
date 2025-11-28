@@ -7,30 +7,20 @@
     "defaultBranch": "main"
   },
   "files": {
+    "ignoreUnknown": true,
     "includes": [
       "**",
-      "!**/.next",
-      "!**/node_modules",
       "!**/.pnpm-store",
       "!**/*.config.js",
-      "!**/out",
-      "!**/build",
-      "!**/dist",
-      "!**/.vercel",
       "!**/*.lock",
       "!**/pnpm-lock.yaml",
       "!**/package-lock.json",
       "!**/yarn.lock",
       "!**/*.min.js",
       "!**/*.min.css",
-      "!**/coverage",
       "!**/.turbo",
-      "!**/.idea",
-      "!**/*.log",
-      "!**/.DS_Store",
-      "!**/.env*"
-    ],
-    "ignoreUnknown": true
+      "!**/.idea"
+    ]
   },
   "formatter": {
     "enabled": true,
