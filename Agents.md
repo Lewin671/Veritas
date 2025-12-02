@@ -31,3 +31,13 @@ This project implements **Veritas**, a simple information retrieval and news ana
 - **Hosting**: Kubernetes (optional for scaling) or VM + containers
 - **AI / LLM SDK**: [Eino](https://github.com/cloudwego/eino)
 - **Config Management**: `.env`
+
+
+## Setup commands
+
+### Style & Lint check
+Always run the following command to check for style and lint issues either before committing or after modifying code in the web directory:
+
+```bash
+cd web && npm run check
+```
