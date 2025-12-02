@@ -9,7 +9,6 @@ This project implements **Veritas**, a simple information retrieval and news ana
 
 - **Framework**: Next.js 16 (App Router, Server Actions)
 - **Language**: TypeScript
-- **Authentication**: Auth.js (Self-hosted)
 - **UI & Styling**: shadcn/ui, Tailwind CSS, Lucide React and Vercel AI SDK for prebuilt AI elements
 - **State Management**: Zustand (Client-side), React Server Components (Server-side)
 - **Validation**: Zod
