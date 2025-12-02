@@ -21,4 +21,14 @@ This project implements **Veritas**, a simple information retrieval and news ana
 ### Server
 
 - **Database**: PostgreSQL
-- **ORM**: -
+- **ORM**: GORM
+- **Authentication**: JWT (access + refresh token)
+- **Cache / Token Store**: Redis
+- **HTTP Framework**: Gin
+- **Reverse Proxy / TLS Termination**: Nginx
+- **Streaming**: Server-Sent Events (SSE) or HTTP Chunked Responses
+- **Observability**: Prometheus for metrics + OpenTelemetry for tracing
+- **Containerization**: Docker + Docker Compose
+- **Hosting**: Kubernetes (optional for scaling) or VM + containers
+- **AI / LLM SDK**: [Eino](https://github.com/cloudwego/eino)
+- **Config Management**: `.env`
