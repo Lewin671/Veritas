@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"net/http"
 	"os"
@@ -31,12 +32,34 @@ type ChatResponse struct {
 }
 
 func GetModels(c *gin.Context) {
-	models := []Model{
+	var modelList []Model
+
+	// Try to load models from environment variable
+	modelsConfig := os.Getenv("AVAILABLE_MODELS")
+	if modelsConfig != "" {
+		log.Printf("Loading models from AVAILABLE_MODELS environment variable")
+		// Parse JSON format: [{"id":"model-id","name":"Model Name","description":"Description"}]
+		if err := json.Unmarshal([]byte(modelsConfig), &modelList); err != nil {
+			log.Printf("Failed to parse AVAILABLE_MODELS, using defaults: %v", err)
+			log.Printf("AVAILABLE_MODELS value: %s", modelsConfig)
+			modelList = getDefaultModels()
+		} else {
+			log.Printf("Successfully loaded %d models from AVAILABLE_MODELS", len(modelList))
+		}
+	} else {
+		log.Printf("AVAILABLE_MODELS not set, using default models")
+		modelList = getDefaultModels()
+	}
+
+	c.JSON(http.StatusOK, modelList)
+}
+
+func getDefaultModels() []Model {
+	return []Model{
 		{ID: "gpt-4o", Name: "GPT-4o", Description: "Most capable model for complex tasks"},
 		{ID: "gpt-4o-mini", Name: "GPT-4o Mini", Description: "Fast and efficient for simple tasks"},
 		{ID: "claude-3-5-sonnet", Name: "Claude 3.5 Sonnet", Description: "High intelligence and speed"},
 	}
-	c.JSON(http.StatusOK, models)
 }
 
 func CreateConversation(c *gin.Context) {
@@ -114,7 +137,25 @@ func Chat(c *gin.Context) {
 	}
 
 	// Call OpenAI API
-	client := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
+	apiKey := os.Getenv("OPENAI_API_KEY")
+	if apiKey == "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "OPENAI_API_KEY is not configured"})
+		return
+	}
+
+	// Support OpenAI compatible APIs with custom base URL
+	var client *openai.Client
+	baseURL := os.Getenv("OPENAI_BASE_URL")
+	if baseURL != "" {
+		log.Printf("Using custom base URL: %s", baseURL)
+		config := openai.DefaultConfig(apiKey)
+		config.BaseURL = baseURL
+		client = openai.NewClientWithConfig(config)
+	} else {
+		log.Printf("Using default OpenAI base URL: https://api.openai.com/v1")
+		client = openai.NewClient(apiKey)
+	}
+
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
