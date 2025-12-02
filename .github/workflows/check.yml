@@ -1,0 +1,45 @@
+# Workflow 名称
+name: Check
+
+# 触发条件：当代码推送到 main/master 分支或创建 PR 时运行
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  # 检查任务
+  check:
+    # 使用最新的 Ubuntu 运行环境
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 步骤 1: 检出代码到 runner
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # 步骤 2: 安装 pnpm 包管理器
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      
+      # 步骤 3: 安装 Node.js 并配置 pnpm 缓存以加快后续构建速度
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: web/pnpm-lock.yaml
+      
+      # 步骤 4: 安装前端依赖（使用 frozen-lockfile 确保使用锁定的版本）
+      - name: Install dependencies
+        working-directory: ./web
+        run: pnpm install --frozen-lockfile
+      
+      # 步骤 5: 运行前端的 check 命令（biome check）
+      - name: Run check
+        working-directory: ./web
+        run: pnpm check
+
