@@ -1,0 +1,25 @@
+{
+  /* --- 1. 全局通用设置 --- */
+  // 开启全局保存自动格式化，不用每个语言都写一遍
+  "editor.formatOnSave": true,
+  // 将 Biome 设为全局默认格式化工具
+  // 这样 JS, TS, JSX, TSX, JSON, CSS 等 Biome 支持的文件都会自动生效
+  "editor.defaultFormatter": "biomejs.biome",
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "editor.quickSuggestions": {
+    "strings": "on"
+  },
+  /* --- 2. 例外处理：Biome 不支持的文件类型 --- */
+  // Biome 暂不支持 HTML，回退到 VS Code 自带
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  // Biome 暂不支持 Markdown，回退到 VS Code 自带
+  "[markdown]": {
+    "editor.defaultFormatter": "vscode.markdown-language-features",
+    "editor.wordWrap": "on"
+  }
+  // 如果你日后写 Python 或 Go，只需要像上面一样添加一个 [python] 块指定它的格式化工具即可
+}
