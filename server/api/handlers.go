@@ -80,9 +80,18 @@ func Chat(c *gin.Context) {
 
 	// Create conversation if not provided
 	if req.ConversationID == "" {
+		title := "New Chat"
+		if len(req.Message) > 0 {
+			if len(req.Message) > 30 {
+				title = req.Message[:30] + "..."
+			} else {
+				title = req.Message
+			}
+		}
+
 		conv := models.Conversation{
 			ID:        uuid.New().String(),
-			Title:     "New Chat", // TODO: Generate title from message
+			Title:     title,
 			CreatedAt: time.Now(),
 		}
 		if err := db.DB.Create(&conv).Error; err != nil {
