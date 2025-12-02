@@ -2,11 +2,16 @@
 name: Check
 
 # 触发条件：当代码推送到 main/master 分支或创建 PR 时运行
+# 仅当 web/ 目录有改动时触发
 on:
   push:
     branches: [main, master]
+    paths:
+      - 'web/**'
   pull_request:
     branches: [main, master]
+    paths:
+      - 'web/**'
 
 jobs:
   # 检查任务
