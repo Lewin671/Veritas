@@ -16,7 +16,7 @@ func GetModels(c *gin.Context) {
 	// Try to load models from environment variable
 	modelsConfig := os.Getenv("AVAILABLE_MODELS")
 	if modelsConfig != "" {
-		log.Printf("Loading models from AVAILABLE_MODELS environment variable")
+		log.Println("Loading models from AVAILABLE_MODELS environment variable")
 		// Parse JSON format: [{"id":"model-id","name":"Model Name","description":"Description"}]
 		if err := json.Unmarshal([]byte(modelsConfig), &modelList); err != nil {
 			log.Printf("Failed to parse AVAILABLE_MODELS, using defaults: %v", err)
@@ -26,7 +26,7 @@ func GetModels(c *gin.Context) {
 			log.Printf("Successfully loaded %d models from AVAILABLE_MODELS", len(modelList))
 		}
 	} else {
-		log.Printf("AVAILABLE_MODELS not set, using default models")
+		log.Println("AVAILABLE_MODELS not set, using default models")
 		modelList = getDefaultModels()
 	}
 

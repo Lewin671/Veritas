@@ -12,7 +12,7 @@ import (
 func createLLMClient() *openai.Client {
 	apiKey := os.Getenv("OPENAI_API_KEY")
 	if apiKey == "" {
-		log.Printf("Warning: OPENAI_API_KEY is not configured")
+		log.Println("Warning: OPENAI_API_KEY is not configured")
 		return nil
 	}
 
@@ -27,7 +27,7 @@ func createLLMClient() *openai.Client {
 		return &client
 	}
 
-	log.Printf("Using default OpenAI base URL: https://api.openai.com/v1")
+	log.Println("Using default OpenAI base URL: https://api.openai.com/v1")
 	client := openai.NewClient(
 		option.WithAPIKey(apiKey),
 	)

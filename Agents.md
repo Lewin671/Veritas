@@ -31,13 +31,25 @@ This project implements **Veritas**, a simple information retrieval and news ana
 - **Hosting**: Kubernetes (optional for scaling) or VM + containers
 - **AI / LLM SDK**: [OpenAI Go SDK](https://github.com/openai/openai-go)
 - **Config Management**: `.env`
+- **Lint/Format**: golangci-lint
 
 
 ## Setup commands
 
 ### Style & Lint check
+
+#### Web
 Always run the following command to check for style and lint issues either before committing or after modifying code in the web directory:
 
 ```bash
 cd web && npm run check
 ```
+
+#### Server
+Always run the following command to check for style and lint issues in the server directory:
+
+```bash
+cd server && golangci-lint run
+```
+
+To install golangci-lint, visit: https://golangci-lint.run/usage/install/

@@ -1,0 +1,56 @@
+run:
+  timeout: 5m
+  go: "1.25"
+
+linters:
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - typecheck
+    - unused
+    - gofmt
+    - goimports
+    - misspell
+    - revive
+    - unconvert
+    - unparam
+    - whitespace
+
+linters-settings:
+  revive:
+    rules:
+      - name: blank-imports
+      - name: context-as-argument
+      - name: context-keys-type
+      - name: dot-imports
+      - name: error-naming
+      - name: error-return
+      - name: error-strings
+      - name: exported
+      - name: if-return
+      - name: increment-decrement
+      - name: indent-error-flow
+      - name: package-comments
+      - name: range
+      - name: receiver-naming
+      - name: redefines-builtin-id
+      - name: superfluous-else
+      - name: time-naming
+      - name: unexported-naming
+      - name: unreachable-code
+      - name: unused-parameter
+      - name: var-declaration
+      - name: var-naming
+
+issues:
+  exclude-rules:
+    - path: _test\.go$
+      linters:
+        - unparam
+        - unused
+    - path: api/chat_handler\.go
+      linters:
+        - unconvert
