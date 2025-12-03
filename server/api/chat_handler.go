@@ -10,7 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	openai "github.com/sashabaranov/go-openai"
+	"github.com/openai/openai-go"
 )
 
 // Chat handles chat requests, creates conversations if needed, and interacts with LLM
@@ -111,15 +111,12 @@ func getLLMResponse(req ChatRequest) string {
 		return "Error: OPENAI_API_KEY is not configured"
 	}
 
-	resp, err := client.CreateChatCompletion(
+	resp, err := client.Chat.Completions.New(
 		context.Background(),
-		openai.ChatCompletionRequest{
-			Model: req.ModelID,
-			Messages: []openai.ChatCompletionMessage{
-				{
-					Role:    openai.ChatMessageRoleUser,
-					Content: req.Message,
-				},
+		openai.ChatCompletionNewParams{
+			Model: openai.ChatModel(req.ModelID),
+			Messages: []openai.ChatCompletionMessageParamUnion{
+				openai.UserMessage(req.Message),
 			},
 		},
 	)

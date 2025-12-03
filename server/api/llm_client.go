@@ -4,7 +4,8 @@ import (
 	"log"
 	"os"
 
-	openai "github.com/sashabaranov/go-openai"
+	"github.com/openai/openai-go"
+	"github.com/openai/openai-go/option"
 )
 
 // createLLMClient creates an OpenAI client with optional custom base URL
@@ -19,11 +20,16 @@ func createLLMClient() *openai.Client {
 	baseURL := os.Getenv("OPENAI_BASE_URL")
 	if baseURL != "" {
 		log.Printf("Using custom base URL: %s", baseURL)
-		config := openai.DefaultConfig(apiKey)
-		config.BaseURL = baseURL
-		return openai.NewClientWithConfig(config)
+		client := openai.NewClient(
+			option.WithAPIKey(apiKey),
+			option.WithBaseURL(baseURL),
+		)
+		return &client
 	}
 
 	log.Printf("Using default OpenAI base URL: https://api.openai.com/v1")
-	return openai.NewClient(apiKey)
+	client := openai.NewClient(
+		option.WithAPIKey(apiKey),
+	)
+	return &client
 }

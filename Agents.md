@@ -29,7 +29,7 @@ This project implements **Veritas**, a simple information retrieval and news ana
 - **Observability**: Prometheus for metrics + OpenTelemetry for tracing
 - **Containerization**: Docker + Docker Compose
 - **Hosting**: Kubernetes (optional for scaling) or VM + containers
-- **AI / LLM SDK**: [Eino](https://github.com/cloudwego/eino)
+- **AI / LLM SDK**: [OpenAI Go SDK](https://github.com/openai/openai-go)
 - **Config Management**: `.env`
 
 
