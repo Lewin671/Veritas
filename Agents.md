@@ -51,5 +51,3 @@ Always run the following command to check for style and lint issues in the serve
 ```bash
 cd server && golangci-lint run
 ```
-
-To install golangci-lint, visit: https://golangci-lint.run/usage/install/
