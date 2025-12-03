@@ -1,6 +1,6 @@
 run:
   timeout: 5m
-  go: "1.25"
+  go: "1.25.0"
 
 linters:
   enable:
@@ -51,6 +51,3 @@ issues:
       linters:
         - unparam
         - unused
-    - path: api/chat_handler\.go
-      linters:
-        - unconvert

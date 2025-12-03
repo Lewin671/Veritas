@@ -143,7 +143,7 @@ func getLLMResponse(req ChatRequest) string {
 	resp, err := client.Chat.Completions.New(
 		context.Background(),
 		openai.ChatCompletionNewParams{
-			Model:    openai.ChatModel(req.ModelID),
+			Model:    openai.ChatModel(req.ModelID), // nolint:unconvert -- API expects ChatModel even though underlying type is string
 			Messages: chatMessages,
 		},
 	)
