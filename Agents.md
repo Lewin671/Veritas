@@ -1,6 +1,6 @@
 ## Introduction
 
-This project implements **Veritas**, a simple information retrieval and news analysis agent.
+**Veritas** is a ChatGPT-like conversational AI interface powered by a ReAct (Reasoning + Acting) agent. It combines real-time information retrieval, web search, and research capabilities to provide accurate, sourced answers. Users interact through a familiar chat interface while the agent reasons through problems, takes actions (like searching), and synthesizes information into coherent responses.
 
 
 ## Tech Stack
