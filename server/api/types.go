@@ -16,5 +16,6 @@ type ChatRequest struct {
 
 // ChatResponse represents a chat message response
 type ChatResponse struct {
-	Response string `json:"response"`
+	Response       string `json:"response"`
+	ConversationID string `json:"conversationId"`
 }

@@ -24,6 +24,11 @@ interface Model {
   description: string;
 }
 
+interface ChatApiResponse {
+  response: string;
+  conversationId?: string;
+}
+
 export function Chat() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
@@ -76,7 +81,7 @@ export function Chat() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
+  }, [messages]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,13 +102,13 @@ export function Chat() {
           conversationId: currentConversationId,
         }),
       });
-      const data = await res.json();
+      const data: ChatApiResponse = await res.json();
 
-      // If it was a new chat, the backend created a conversation ID
-      // We should refresh the list and set the current ID if we can get it from response
-      // But currently the chat API doesn't return the conversation ID explicitly in the top level
-      // Ideally we should update the backend to return it.
-      // For now, let's just refresh the list.
+      // Update current conversation ID based on backend response
+      if (data.conversationId) {
+        setCurrentConversationId(data.conversationId);
+      }
+
       fetchConversations();
 
       const botMessage: Message = { role: 'assistant', content: data.response };

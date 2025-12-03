@@ -45,7 +45,8 @@ func Chat(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, ChatResponse{
-		Response: responseContent,
+		Response:       responseContent,
+		ConversationID: req.ConversationID,
 	})
 }
 
@@ -104,20 +105,46 @@ func saveAssistantMessage(conversationID, content string) error {
 	return db.DB.Create(&assistantMsg).Error
 }
 
-// getLLMResponse calls the LLM API and returns the response
+// getLLMResponse calls the LLM API with full conversation history and returns the response
 func getLLMResponse(req ChatRequest) string {
 	client := createLLMClient()
 	if client == nil {
 		return "Error: OPENAI_API_KEY is not configured"
 	}
 
+	// Load full conversation history so the model has memory
+	var history []models.Message
+	if err := db.DB.
+		Where("conversation_id = ?", req.ConversationID).
+		Order("created_at asc").
+		Find(&history).Error; err != nil {
+		log.Printf("Failed to load conversation history: %v", err)
+	}
+
+	var chatMessages []openai.ChatCompletionMessageParamUnion
+
+	// Convert stored messages into OpenAI chat messages
+	for _, m := range history {
+		switch m.Role {
+		case "user":
+			chatMessages = append(chatMessages, openai.UserMessage(m.Content))
+		case "assistant":
+			chatMessages = append(chatMessages, openai.AssistantMessage(m.Content))
+		default:
+			// Ignore unknown roles for now
+		}
+	}
+
+	// Fallback: if for some reason we have no history, at least send the current message
+	if len(chatMessages) == 0 {
+		chatMessages = append(chatMessages, openai.UserMessage(req.Message))
+	}
+
 	resp, err := client.Chat.Completions.New(
 		context.Background(),
 		openai.ChatCompletionNewParams{
 			Model: openai.ChatModel(req.ModelID),
-			Messages: []openai.ChatCompletionMessageParamUnion{
-				openai.UserMessage(req.Message),
-			},
+			Messages: chatMessages,
 		},
 	)
 
