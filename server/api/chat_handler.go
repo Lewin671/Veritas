@@ -39,7 +39,7 @@ func Chat(c *gin.Context) {
 	responseContent := getLLMResponse(req)
 
 	// Save assistant message
-	if err := saveAssistantMessage(req.ConversationID, responseContent); err != nil {
+	if err := saveAssistantMessage(req.ConversationID, responseContent, req.ModelConfigID); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save response"})
 		return
 	}
@@ -89,17 +89,19 @@ func saveUserMessage(req ChatRequest) error {
 		ConversationID: req.ConversationID,
 		Role:           "user",
 		Content:        req.Message,
+		ModelConfigID:  req.ModelConfigID,
 		CreatedAt:      time.Now(),
 	}
 	return db.DB.Create(&userMsg).Error
 }
 
 // saveAssistantMessage saves the assistant's response to the database
-func saveAssistantMessage(conversationID, content string) error {
+func saveAssistantMessage(conversationID, content, modelConfigID string) error {
 	assistantMsg := models.Message{
 		ConversationID: conversationID,
 		Role:           "assistant",
 		Content:        content,
+		ModelConfigID:  modelConfigID,
 		CreatedAt:      time.Now(),
 	}
 	return db.DB.Create(&assistantMsg).Error
@@ -107,9 +109,26 @@ func saveAssistantMessage(conversationID, content string) error {
 
 // getLLMResponse calls the LLM API with full conversation history and returns the response
 func getLLMResponse(req ChatRequest) string {
-	client := createLLMClient()
-	if client == nil {
-		return "Error: OPENAI_API_KEY is not configured"
+	// Retrieve model configuration
+	var modelConfig models.ModelConfig
+	if req.ModelConfigID == "" {
+		// Try to get default model config
+		if err := db.DB.Where("is_default = ?", true).First(&modelConfig).Error; err != nil {
+			log.Printf("No model configuration specified and no default found: %v", err)
+			return "Error: No model configuration specified. Please select a model."
+		}
+	} else {
+		if err := db.DB.First(&modelConfig, "id = ?", req.ModelConfigID).Error; err != nil {
+			log.Printf("Failed to load model configuration: %v", err)
+			return "Error: Invalid model configuration"
+		}
+	}
+
+	// Create LLM client from config
+	client, err := createLLMClientFromConfig(&modelConfig, true) // true = decrypt API key
+	if err != nil {
+		log.Printf("Failed to create LLM client: %v", err)
+		return "Error: Failed to create LLM client. " + err.Error()
 	}
 
 	// Load full conversation history so the model has memory
@@ -143,7 +162,7 @@ func getLLMResponse(req ChatRequest) string {
 	resp, err := client.Chat.Completions.New(
 		context.Background(),
 		openai.ChatCompletionNewParams{
-			Model:    req.ModelID,
+			Model:    openai.ChatModel(modelConfig.ModelID), //nolint:unconvert
 			Messages: chatMessages,
 		},
 	)

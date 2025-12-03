@@ -16,5 +16,6 @@ type Message struct {
 	ConversationID string    `json:"conversationId"`
 	Role           string    `json:"role"`
 	Content        string    `json:"content"`
+	ModelConfigID  string    `json:"modelConfigId"` // Track which model was used
 	CreatedAt      time.Time `json:"createdAt"`
 }

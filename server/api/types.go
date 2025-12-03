@@ -1,7 +1,5 @@
 package api
 
-import "github.com/openai/openai-go"
-
 // Model represents an available LLM model
 type Model struct {
 	ID          string `json:"id"`
@@ -11,9 +9,9 @@ type Model struct {
 
 // ChatRequest represents a chat message request
 type ChatRequest struct {
-	ModelID        openai.ChatModel `json:"modelId"`
-	Message        string           `json:"message"`
-	ConversationID string           `json:"conversationId"`
+	ModelConfigID  string `json:"modelConfigId"` // ID of the model configuration to use
+	Message        string `json:"message"`
+	ConversationID string `json:"conversationId"`
 }
 
 // ChatResponse represents a chat message response

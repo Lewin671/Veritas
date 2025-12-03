@@ -29,7 +29,7 @@ func main() {
 	// CORS configuration
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{"http://localhost:3000"}
-	config.AllowMethods = []string{"GET", "POST", "OPTIONS"}
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
 	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept"}
 	r.Use(cors.New(config))
 
@@ -41,6 +41,14 @@ func main() {
 		apiGroup.GET("/conversations", api.GetConversations)
 		apiGroup.GET("/conversations/:id", api.GetConversation)
 		apiGroup.POST("/conversations", api.CreateConversation)
+
+		// Model configuration endpoints
+		apiGroup.POST("/model-configs", api.CreateModelConfig)
+		apiGroup.GET("/model-configs", api.GetModelConfigs)
+		apiGroup.GET("/model-configs/:id", api.GetModelConfig)
+		apiGroup.PUT("/model-configs/:id", api.UpdateModelConfig)
+		apiGroup.DELETE("/model-configs/:id", api.DeleteModelConfig)
+		apiGroup.POST("/model-configs/test", api.TestModelConfig)
 	}
 
 	log.Println("Server starting on :8080")

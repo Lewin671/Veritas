@@ -1,6 +1,7 @@
 'use client';
 
-import { Bot, MessageSquare, Plus, Send, User } from 'lucide-react';
+import { Bot, MessageSquare, Plus, Send, Settings, User } from 'lucide-react';
+import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +10,7 @@ import { cn } from '@/lib/utils';
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  modelConfigId?: string;
 }
 
 interface Conversation {
@@ -18,10 +20,15 @@ interface Conversation {
   messages?: Message[];
 }
 
-interface Model {
+interface ModelConfig {
   id: string;
   name: string;
-  description: string;
+  provider: string;
+  baseUrl: string;
+  modelId: string;
+  isDefault: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface ChatApiResponse {
@@ -34,8 +41,8 @@ export function Chat() {
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [models, setModels] = useState<Model[]>([]);
-  const [selectedModel, setSelectedModel] = useState<string>('');
+  const [modelConfigs, setModelConfigs] = useState<ModelConfig[]>([]);
+  const [selectedModelConfigId, setSelectedModelConfigId] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -47,16 +54,18 @@ export function Chat() {
   }, []);
 
   useEffect(() => {
-    // Fetch models
-    fetch('http://localhost:8080/api/models')
+    // Fetch model configs
+    fetch('http://localhost:8080/api/model-configs')
       .then((res) => res.json())
       .then((data) => {
-        setModels(data);
+        setModelConfigs(data);
         if (data.length > 0) {
-          setSelectedModel(data[0].id);
+          // Select default model or first model
+          const defaultModel = data.find((m: ModelConfig) => m.isDefault);
+          setSelectedModelConfigId(defaultModel?.id || data[0].id);
         }
       })
-      .catch((err) => console.error('Failed to fetch models:', err));
+      .catch((err) => console.error('Failed to fetch model configs:', err));
 
     // Fetch conversations
     fetchConversations();
@@ -85,7 +94,7 @@ export function Chat() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || !selectedModel) return;
+    if (!input.trim() || !selectedModelConfigId) return;
 
     const userMessage: Message = { role: 'user', content: input };
     setMessages((prev) => [...prev, userMessage]);
@@ -97,7 +106,7 @@ export function Chat() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          modelId: selectedModel,
+          modelConfigId: selectedModelConfigId,
           message: userMessage.content,
           conversationId: currentConversationId,
         }),
@@ -111,17 +120,30 @@ export function Chat() {
 
       fetchConversations();
 
-      const botMessage: Message = { role: 'assistant', content: data.response };
+      const botMessage: Message = {
+        role: 'assistant',
+        content: data.response,
+        modelConfigId: selectedModelConfigId,
+      };
       setMessages((prev) => [...prev, botMessage]);
     } catch (err) {
       console.error('Failed to send message:', err);
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: 'Error: Failed to get response from server.' },
+        {
+          role: 'assistant',
+          content: 'Error: Failed to get response from server.',
+        },
       ]);
     } finally {
       setLoading(false);
     }
+  };
+
+  const getModelName = (modelConfigId?: string) => {
+    if (!modelConfigId) return null;
+    const config = modelConfigs.find((m) => m.id === modelConfigId);
+    return config?.name;
   };
 
   return (
@@ -157,17 +179,24 @@ export function Chat() {
         {/* Header */}
         <div className="flex h-14 items-center justify-between border-b px-4">
           <div className="font-semibold">Veritas</div>
-          <select
-            className="rounded-md border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-            value={selectedModel}
-            onChange={(e) => setSelectedModel(e.target.value)}
-          >
-            {models.map((model) => (
-              <option key={model.id} value={model.id}>
-                {model.name}
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center gap-2">
+            <select
+              className="rounded-md border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              value={selectedModelConfigId}
+              onChange={(e) => setSelectedModelConfigId(e.target.value)}
+            >
+              {modelConfigs.map((config) => (
+                <option key={config.id} value={config.id}>
+                  {config.name} {config.isDefault && '(Default)'}
+                </option>
+              ))}
+            </select>
+            <Link href="/settings">
+              <Button variant="ghost" size="sm">
+                <Settings className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Messages */}
@@ -191,13 +220,20 @@ export function Chat() {
                   <Bot className="h-5 w-5 text-primary" />
                 </div>
               )}
-              <div
-                className={cn(
-                  'max-w-[80%] whitespace-pre-wrap rounded-lg px-4 py-2',
-                  msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
+              <div className="flex flex-col gap-1">
+                <div
+                  className={cn(
+                    'max-w-[80%] whitespace-pre-wrap rounded-lg px-4 py-2',
+                    msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                  )}
+                >
+                  {msg.content}
+                </div>
+                {msg.role === 'assistant' && msg.modelConfigId && (
+                  <div className="text-muted-foreground text-xs">
+                    {getModelName(msg.modelConfigId)}
+                  </div>
                 )}
-              >
-                {msg.content}
               </div>
               {msg.role === 'user' && (
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted">
