@@ -11,7 +11,7 @@ type ModelConfig struct {
 	Provider  string    `gorm:"not null" json:"provider"`
 	BaseURL   string    `json:"baseUrl"`
 	ModelID   string    `gorm:"not null" json:"modelId"`
-	APIKey    string    `gorm:"not null" json:"-"` // Encrypted, never sent to client
+	APIKey    string    `json:"-"` // Encrypted, never sent to client. Optional for local models like Ollama
 	IsDefault bool      `gorm:"default:false" json:"isDefault"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`

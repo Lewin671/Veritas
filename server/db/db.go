@@ -39,10 +39,13 @@ func Init() {
 	// Pre-migration: Add columns without NOT NULL constraint if they don't exist
 	DB.Exec("ALTER TABLE model_configs ADD COLUMN IF NOT EXISTS provider text")
 	DB.Exec("ALTER TABLE model_configs ADD COLUMN IF NOT EXISTS model_id text")
-	
+
 	// Update existing null values with defaults
 	DB.Exec("UPDATE model_configs SET provider = 'openai' WHERE provider IS NULL OR provider = ''")
 	DB.Exec("UPDATE model_configs SET model_id = 'gpt-4o-mini' WHERE model_id IS NULL OR model_id = ''")
+
+	// Remove NOT NULL constraint from api_key to support local models like Ollama
+	DB.Exec("ALTER TABLE model_configs ALTER COLUMN api_key DROP NOT NULL")
 
 	// Auto Migrate (will add NOT NULL constraints)
 	err = DB.AutoMigrate(&models.Conversation{}, &models.Message{}, &models.ModelConfig{})

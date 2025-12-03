@@ -269,15 +269,17 @@ export function ModelConfigPanel() {
 
               <div>
                 <label htmlFor="apiKey" className="mb-1 block font-medium text-sm">
-                  API Key *
+                  API Key
+                  <span className="ml-1 text-muted-foreground text-xs">
+                    (Optional for local models)
+                  </span>
                 </label>
                 <Input
                   id="apiKey"
                   type="password"
                   value={formData.apiKey}
                   onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
-                  placeholder="sk-..."
-                  required
+                  placeholder="sk-... (leave empty for Ollama)"
                 />
               </div>
 
@@ -308,12 +310,7 @@ export function ModelConfigPanel() {
               )}
 
               <div className="flex gap-2">
-                <Button
-                  type="button"
-                  onClick={handleTest}
-                  disabled={testing || !formData.apiKey}
-                  variant="outline"
-                >
+                <Button type="button" onClick={handleTest} disabled={testing} variant="outline">
                   {testing ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -90,7 +90,7 @@ export function Chat() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

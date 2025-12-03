@@ -51,30 +51,40 @@ func EncryptAPIKey(plaintext string) (string, error) {
 }
 
 // DecryptAPIKey decrypts an encrypted API key
+// If the input is not in encrypted format (e.g., plain text), returns it as-is
 func DecryptAPIKey(encrypted string) (string, error) {
+	// If empty, return empty
+	if encrypted == "" {
+		return "", nil
+	}
+
 	key, err := getEncryptionKey()
 	if err != nil {
 		return "", err
 	}
 
 	parts := strings.Split(encrypted, ":")
+	// If not in encrypted format (v1:nonce:ciphertext), assume it's plain text
 	if len(parts) != 3 {
-		return "", errors.New("invalid encrypted format")
+		return encrypted, nil
 	}
 
 	version := parts[0]
 	if version != keyVersion {
-		return "", fmt.Errorf("unsupported key version: %s", version)
+		// If version doesn't match, might be plain text with colons
+		return encrypted, nil
 	}
 
 	nonce, err := base64.StdEncoding.DecodeString(parts[1])
 	if err != nil {
-		return "", fmt.Errorf("failed to decode nonce: %w", err)
+		// Not valid base64, assume plain text
+		return encrypted, nil
 	}
 
 	ciphertext, err := base64.StdEncoding.DecodeString(parts[2])
 	if err != nil {
-		return "", fmt.Errorf("failed to decode ciphertext: %w", err)
+		// Not valid base64, assume plain text
+		return encrypted, nil
 	}
 
 	block, err := aes.NewCipher(key)
@@ -89,7 +99,8 @@ func DecryptAPIKey(encrypted string) (string, error) {
 
 	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
 	if err != nil {
-		return "", fmt.Errorf("failed to decrypt: %w", err)
+		// Decryption failed, might be plain text that looks like encrypted format
+		return encrypted, nil
 	}
 
 	return string(plaintext), nil

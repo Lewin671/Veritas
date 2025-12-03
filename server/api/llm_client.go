@@ -46,8 +46,8 @@ func createLLMClientFromConfig(config *models.ModelConfig, decrypt bool) (*opena
 
 	apiKey := config.APIKey
 
-	// Decrypt API key if needed
-	if decrypt {
+	// Decrypt API key if needed and not empty
+	if decrypt && apiKey != "" {
 		decryptedKey, err := services.DecryptAPIKey(config.APIKey)
 		if err != nil {
 			return nil, fmt.Errorf("failed to decrypt API key: %w", err)
@@ -55,8 +55,11 @@ func createLLMClientFromConfig(config *models.ModelConfig, decrypt bool) (*opena
 		apiKey = decryptedKey
 	}
 
+	// For local models like Ollama, API key can be empty or a placeholder
+	// Use "ollama" as default if empty for local models
 	if apiKey == "" {
-		return nil, fmt.Errorf("API key is empty")
+		apiKey = "ollama"
+		log.Printf("Using placeholder API key for local model: %s", config.Name)
 	}
 
 	// Create client with custom base URL if provided

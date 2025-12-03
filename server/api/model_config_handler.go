@@ -19,7 +19,7 @@ type ModelConfigRequest struct {
 	Provider  string `json:"provider" binding:"required"`
 	BaseURL   string `json:"baseUrl"`
 	ModelID   string `json:"modelId" binding:"required"`
-	APIKey    string `json:"apiKey" binding:"required"`
+	APIKey    string `json:"apiKey"` // Optional for local models like Ollama
 	IsDefault bool   `json:"isDefault"`
 }
 
@@ -31,11 +31,15 @@ func CreateModelConfig(c *gin.Context) {
 		return
 	}
 
-	// Encrypt API key
-	encryptedKey, err := services.EncryptAPIKey(req.APIKey)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to encrypt API key"})
-		return
+	// Encrypt API key if provided
+	var encryptedKey string
+	if req.APIKey != "" {
+		var err error
+		encryptedKey, err = services.EncryptAPIKey(req.APIKey)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to encrypt API key"})
+			return
+		}
 	}
 
 	// If this is set as default, unset other defaults
@@ -117,11 +121,18 @@ func UpdateModelConfig(c *gin.Context) {
 		return
 	}
 
-	// Encrypt new API key
-	encryptedKey, err := services.EncryptAPIKey(req.APIKey)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to encrypt API key"})
-		return
+	// Encrypt new API key if provided
+	var encryptedKey string
+	if req.APIKey != "" {
+		var err error
+		encryptedKey, err = services.EncryptAPIKey(req.APIKey)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to encrypt API key"})
+			return
+		}
+	} else {
+		// Keep existing API key if not provided
+		encryptedKey = config.APIKey
 	}
 
 	// If this is set as default, unset other defaults
@@ -183,7 +194,7 @@ func DeleteModelConfig(c *gin.Context) {
 type TestModelConfigRequest struct {
 	BaseURL string `json:"baseUrl"`
 	ModelID string `json:"modelId" binding:"required"`
-	APIKey  string `json:"apiKey" binding:"required"`
+	APIKey  string `json:"apiKey"` // Optional for local models like Ollama
 }
 
 // TestModelConfigResponse represents the response for testing a model config
