@@ -39,4 +39,5 @@ build/
 *.tmp
 *.temp
 .cache/
+go.work.sum
 
